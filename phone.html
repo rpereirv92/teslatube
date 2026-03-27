@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TeslaTube Passager</title>
+<style>
+body { font-family: Arial; padding: 20px; background:#222; color:white;}
+input { width: 100%; padding:10px; font-size:18px; margin-bottom:10px;}
+button { padding:10px 15px; font-size:18px; margin-top:5px;}
+.video { margin:15px 0;}
+img { width:100%; border-radius:10px;}
+</style>
+</head>
+<body>
+
+<h2>📱 TeslaTube Passager</h2>
+<input id="search" placeholder="Recherche YouTube...">
+<div id="results"></div>
+
+<script>
+const API_KEY = "TA_CLE_API";
+
+document.getElementById("search").addEventListener("input", async () => {
+  const q = document.getElementById("search").value;
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${q}&maxResults=5&key=${API_KEY}`);
+  const data = await res.json();
+  const html = data.items.map(v => `
+    <div class="video">
+      <img src="${v.snippet.thumbnails.medium.url}">
+      <button onclick="window.open('https://www.youtube.com/watch?v=${v.id.videoId}','_blank')">▶️ Lire</button>
+      <button onclick="addFavorite('${v.id.videoId}')">⭐ Favoris</button>
+    </div>
+  `).join("");
+  document.getElementById("results").innerHTML = html;
+});
+
+function addFavorite(id) {
+  let favs = JSON.parse(localStorage.getItem("teslatubeFavorites") || "[]");
+  if(!favs.includes(id)) {
+    favs.push(id);
+    localStorage.setItem("teslatubeFavorites", JSON.stringify(favs));
+  }
+}
+</script>
+
+</body>
+</html>
